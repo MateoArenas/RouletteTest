@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RouletteTest.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace RouletteTest.Controllers
 {
@@ -12,36 +11,44 @@ namespace RouletteTest.Controllers
     [ApiController]
     public class RouletteController : ControllerBase
     {
-        // GET: api/<RouletteController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private GeneralProcess _generalProcess;
+
+        public RouletteController()
         {
-            return new string[] { "value1", "value2" };
+            _generalProcess = new GeneralProcess();
         }
 
-        // GET api/<RouletteController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpPost("[action]")]
+        public string CreateRoulette()
         {
-            return "value";
+            try
+            {
+                Roulette roulette = new Roulette()
+                {
+                    Id = _generalProcess.GenerateRouletteId(),
+                    bool_OpeningStatus = false
+                };
+                _generalProcess.SaveRoulette(roulette);
+                return "El id de su nueva ruleta es: " + roulette.Id;
+            }
+            catch
+            {
+                return "No logramas crear su ruleta, inténtalo más tarde.";
+            }
         }
 
-        // POST api/<RouletteController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPut("[action]")]
+        public string OpenRouletteBets(string Id)
         {
-        }
-
-        // PUT api/<RouletteController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<RouletteController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            try
+            {
+                _generalProcess.OpenRoulette(Id);
+                return "Operación aceptada";
+            }
+            catch 
+            {
+                return "Operación denegada";
+            }
         }
     }
 }
