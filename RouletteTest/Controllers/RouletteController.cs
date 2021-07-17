@@ -12,12 +12,17 @@ namespace RouletteTest.Controllers
     public class RouletteController : ControllerBase
     {
         private GeneralProcess _generalProcess;
-
+        private MongoDBConnection DBProcess;
         public RouletteController()
         {
             _generalProcess = new GeneralProcess();
+            DBProcess = new MongoDBConnection();
         }
-
+        [HttpGet("[action]")]
+        public ObjectResult ListRoulettes() 
+        {
+            return Ok(DBProcess.ListRoulettes());
+        }
         [HttpPost("[action]")]
         public string CreateRoulette()
         {
@@ -28,7 +33,7 @@ namespace RouletteTest.Controllers
                     Id = _generalProcess.GenerateRouletteId(),
                     bool_OpeningStatus = false
                 };
-                _generalProcess.SaveRoulette(roulette);
+                DBProcess.CreateRoulette(roulette);
                 return "El id de su nueva ruleta es: " + roulette.Id;
             }
             catch
@@ -36,13 +41,12 @@ namespace RouletteTest.Controllers
                 return "No logramas crear su ruleta, inténtalo más tarde.";
             }
         }
-
         [HttpPut("[action]")]
         public string OpenRouletteBets(string Id)
         {
             try
             {
-                _generalProcess.OpenRoulette(Id);
+                DBProcess.OpenRoulette(Id);
                 return "Operación aceptada";
             }
             catch 
