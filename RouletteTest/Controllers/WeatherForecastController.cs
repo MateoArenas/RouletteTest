@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using RouletteTest.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,8 @@ namespace RouletteTest.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            MongoDBConnection connection = new MongoDBConnection();
+            connection.ConnectMongoDB();
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
