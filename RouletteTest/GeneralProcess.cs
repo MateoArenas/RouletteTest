@@ -23,7 +23,7 @@ namespace RouletteTest
             result = result.ToLower();
             return result;
         }
-        public string ValidateDataBet(Bet bet) 
+        public string ValidateDataBet(Bet bet)
         {
             if (string.IsNullOrEmpty(bet.str_ClientId))
             {
@@ -37,13 +37,13 @@ namespace RouletteTest
             {
                 return "Debe elegir un número entre 0 o 36, o escoger rojo o negro para realizar su apuesta";
             }
-            if (bet.int_BetAmount <= 0)
+            if (bet.double_BetAmount <= 0)
             {
                 return "Debe apostar por montas mayores que cero (0)";
             }
             return "OK";
         }
-        public string ValidateMaxAmount(int Amount) 
+        public string ValidateMaxAmount(double Amount)
         {
             if (Amount > 10000)
             {
@@ -51,8 +51,8 @@ namespace RouletteTest
             }
             return "OK";
         }
-        public string ValidateChoiceBet(string choicebet) 
-        {            
+        public string ValidateChoiceBet(string choicebet)
+        {
             if (IsNumberValue(choicebet))
             {
                 int ChoiseNumber = Convert.ToInt32(choicebet);
@@ -70,10 +70,64 @@ namespace RouletteTest
             }
             return "OK";
         }
-        private bool IsNumberValue(string value) 
+        private bool IsNumberValue(string value)
         {
             Regex regex = new Regex(@"^\d$");
             return regex.IsMatch(value);
+        }
+        private string GenerateWinNumber()
+        {
+            Random random = new Random();
+            int WinnerNumber = random.Next(0, 38);
+            switch (WinnerNumber)
+            {
+                case 37:
+                    return "NEGRO";
+                case 38:
+                    return "ROJO";
+                default:
+                    return WinnerNumber.ToString();
+            }
+        }
+        public List<BettingResults> ListWinnersRoulette(string RouletteId)
+        {
+            List<BettingResults> ResultsList = new List<BettingResults>();
+            List<Bet> ParticipateList = DBProcess.RouletteBettingList(RouletteId);
+            string WinnerNumber = GenerateWinNumber();
+            foreach (var item in ParticipateList)
+            {
+                if (WinnerNumber == item.str_ChoiceBet.ToUpper())
+                {
+                    if (IsNumberValue(WinnerNumber))
+                    {
+                        ResultsList.Add(new BettingResults
+                        {
+                            str_Client = item.str_ClientId,
+                            str_Result = "Ha ganado en el juego de la ruleta!",
+                            double_Profit = item.double_BetAmount * 5,
+                        });
+                    }
+                    else
+                    {
+                        ResultsList.Add(new BettingResults
+                        {
+                            str_Client = item.str_ClientId,
+                            str_Result = "Ha ganado en el juego de la ruleta!",
+                            double_Profit = item.double_BetAmount * (1.8),
+                        });
+                    }
+                }
+                else
+                {
+                    ResultsList.Add(new BettingResults
+                    {
+                        str_Client = item.str_ClientId,
+                        str_Result = "Ha perdido en el juego de la ruleta",
+                        double_Profit = -item.double_BetAmount,
+                    });
+                }
+            }
+            return ResultsList;
         }
     }
 }

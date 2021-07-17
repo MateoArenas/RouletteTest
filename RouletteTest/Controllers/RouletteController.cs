@@ -12,16 +12,16 @@ namespace RouletteTest.Controllers
     public class RouletteController : ControllerBase
     {
         private GeneralProcess _generalProcess;
-        private MongoDBConnection DBProcess;
+        private MongoDBConnection _DBProcess;
         public RouletteController()
         {
             _generalProcess = new GeneralProcess();
-            DBProcess = new MongoDBConnection();
+            _DBProcess = new MongoDBConnection();
         }
         [HttpGet("[action]")]
         public ObjectResult ListRoulettes() 
         {
-            return Ok(DBProcess.ListRoulettes());
+            return Ok(_DBProcess.ListRoulettes());
         }
         [HttpPost("[action]")]
         public string CreateRoulette()
@@ -33,7 +33,7 @@ namespace RouletteTest.Controllers
                     Id = _generalProcess.GenerateRouletteId(),
                     bool_OpeningStatus = false
                 };
-                DBProcess.CreateRoulette(roulette);
+                _DBProcess.CreateRoulette(roulette);
                 return "El id de su nueva ruleta es: " + roulette.Id;
             }
             catch
@@ -46,12 +46,28 @@ namespace RouletteTest.Controllers
         {
             try
             {
-                DBProcess.OpenRoulette(Id);
+                _DBProcess.OpenRoulette(Id);
                 return "Operación aceptada";
             }
             catch 
             {
                 return "Operación denegada";
+            }
+        }
+
+        [HttpPut("[action]")]
+        public ObjectResult CloseRouletteBets(string IdRoulette)
+        {
+            try
+            {
+                _DBProcess.CloseRoulette(IdRoulette);
+                List<BettingResults> bettingResults = _generalProcess.ListWinnersRoulette(IdRoulette);
+                _DBProcess.DeleteBets(IdRoulette);
+                return Ok(bettingResults);
+            }
+            catch
+            {
+                return Ok("No hemos podido determinar los ganadores, inténtalo en otro momento.");
             }
         }
     }

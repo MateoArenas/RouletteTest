@@ -25,7 +25,7 @@ namespace RouletteTest.Controllers
                 {
                     return ResponseValidates;
                 }
-                ResponseValidates = _generalProcess.ValidateMaxAmount(bet.int_BetAmount);
+                ResponseValidates = _generalProcess.ValidateMaxAmount(bet.double_BetAmount);
                 if (ResponseValidates != "OK")
                 {
                     return ResponseValidates;

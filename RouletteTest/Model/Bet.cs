@@ -19,7 +19,7 @@ namespace RouletteTest.Model
         [BsonElement("roulette")]
         public string str_Roulette { get; set; }
         [BsonElement("betamount")]
-        public int int_BetAmount { get; set; }
+        public double double_BetAmount { get; set; }
         [BsonElement("choicebet")]
         public string str_ChoiceBet { get; set; }
     }
