@@ -15,20 +15,23 @@ namespace RouletteTest.DBConnections
             _mongoDatabase = _mongoClient.GetDatabase("RouletteTest"); ;
         }
         #region Roulette
-        public List<Roulette> ListRoulettes()
+        public List<Roulette> ListAllRoulettes()
         {
             IMongoCollection<Roulette> collection = _mongoDatabase.GetCollection<Roulette>("Roulette");
+
             return collection.Find(x => true).ToList();
         }
-        public Roulette FindRouletteForID(string RouletteID)
+        public Roulette FindRouletteForID(string rouletteId)
         {
             IMongoCollection<Roulette> collection = _mongoDatabase.GetCollection<Roulette>("Roulette");
-            return collection.Find(x => x.Id == RouletteID).FirstOrDefault();
+
+            return collection.Find(x => x.Id == rouletteId).FirstOrDefault();
         }
-        public bool FindStateRouletteForID(string RouletteID)
+        public bool FindStateRouletteForID(string rouletteId)
         {
             IMongoCollection<Roulette> collection = _mongoDatabase.GetCollection<Roulette>("Roulette");
-            Roulette roulette = collection.Find(x => x.Id == RouletteID).FirstOrDefault();
+            Roulette roulette = collection.Find(x => x.Id == rouletteId).FirstOrDefault();
+
             return roulette.bool_OpeningStatus;
         }
         public void CreateRoulette(Roulette roulette)
@@ -36,36 +39,42 @@ namespace RouletteTest.DBConnections
             IMongoCollection<Roulette> collection = _mongoDatabase.GetCollection<Roulette>("Roulette");
             collection.InsertOne(roulette);
         }
-        public void OpenRoulette(string RouletteId)
+        public void OpenRoulette(string rouletteId)
         {
             IMongoCollection<Roulette> collection = _mongoDatabase.GetCollection<Roulette>("Roulette");
-            Roulette InformationRouletteState = collection.Find(x => x.Id == RouletteId).FirstOrDefault();
+            Roulette InformationRouletteState = collection.Find(x => x.Id == rouletteId).FirstOrDefault();
             InformationRouletteState.bool_OpeningStatus = true;
-            collection.ReplaceOne(x => x.Id == RouletteId, InformationRouletteState);
+            collection.ReplaceOne(x => x.Id == rouletteId, InformationRouletteState);
         }
-        public void CloseRoulette(string RouletteId)
+        public void CloseRoulette(string rouletteId)
         {
             IMongoCollection<Roulette> collection = _mongoDatabase.GetCollection<Roulette>("Roulette");
-            Roulette InformationRouletteState = collection.Find(x => x.Id == RouletteId).FirstOrDefault();
+            Roulette InformationRouletteState = collection.Find(x => x.Id == rouletteId).FirstOrDefault();
             InformationRouletteState.bool_OpeningStatus = false;
-            collection.ReplaceOne(x => x.Id == RouletteId, InformationRouletteState);
-        }      
+            collection.ReplaceOne(x => x.Id == rouletteId, InformationRouletteState);
+        }
         #endregion
         #region Bet
+        public List<Bet> ListAllBets()
+        {
+            IMongoCollection<Bet> collection = _mongoDatabase.GetCollection<Bet>("Bet");
+            return collection.Find(x => true).ToList();
+        }
         public void CreateBet(Bet bet)
         {
             IMongoCollection<Bet> collection = _mongoDatabase.GetCollection<Bet>("Bet");
             collection.InsertOne(bet);
         }
-        public void DeleteBetsForRuletteId(string RouletteId)
+        public void DeleteBetsForRuletteId(string rouletteId)
         {
             IMongoCollection<Bet> collection = _mongoDatabase.GetCollection<Bet>("Bet");
-            collection.DeleteMany(x => x.str_RouletteId == RouletteId);
+            collection.DeleteMany(x => x.str_RouletteId == rouletteId);
         }
-        public List<Bet> RouletteBettingList(string RouletteId)
+        public List<Bet> BettingListForRouletteId(string rouletteId)
         {
             IMongoCollection<Bet> collection = _mongoDatabase.GetCollection<Bet>("Bet");
-            return collection.Find(x => x.str_RouletteId == RouletteId).ToList();
+
+            return collection.Find(x => x.str_RouletteId == rouletteId).ToList();
         }
         #endregion
     }

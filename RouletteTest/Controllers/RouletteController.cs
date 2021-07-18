@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RouletteTest.DBConnections;
-using RouletteTest.Models;
-using System.Collections.Generic;
 
 namespace RouletteTest.Controllers
 {
@@ -10,18 +7,16 @@ namespace RouletteTest.Controllers
     public class RouletteController : ControllerBase
     {
         private InternalProcess _InternalProcess;
-        private MongoDBConnection _DBProcess;
         public RouletteController()
         {
             _InternalProcess = new InternalProcess();
-            _DBProcess = new MongoDBConnection();
         }
         [HttpGet("[action]")]
-        public ObjectResult ListRoulettes() 
+        public ObjectResult ListAllRoulettes() 
         {
             try
             {
-                return Ok(_DBProcess.ListRoulettes());
+                return Ok(_InternalProcess.ListRoulettes());
             }
             catch
             {
@@ -29,11 +24,11 @@ namespace RouletteTest.Controllers
             }          
         }
         [HttpPost("[action]")]
-        public ObjectResult CreateRoulette(string RouletteName)
+        public ObjectResult CreateRoulette(string rouletteName)
         {
             try
             {
-                return Ok(_InternalProcess.CreateRoulette(RouletteName));
+                return Ok(_InternalProcess.CreateRoulette(rouletteName: rouletteName));
             }
             catch
             {
@@ -41,26 +36,23 @@ namespace RouletteTest.Controllers
             }
         }
         [HttpPut("[action]")]
-        public ObjectResult OpenRoulette(string RouletteId)
+        public ObjectResult OpenRoulette(string rouletteId)
         {
             try
             {               
-                return Ok(_InternalProcess.OpenRoulette(RouletteId));
+                return Ok(_InternalProcess.OpenRoulette(rouletteId: rouletteId));
             }
             catch 
             {
                 return Ok("Operación denegada. Inténtelo más tarde.");
             }
         }
-        [HttpPut("[action]")]
-        public ObjectResult CloseRoulette(string RouletteId)
+        [HttpPost("[action]")]
+        public ObjectResult CloseRoulette(string rouletteId)
         {
             try
-            {
-                _DBProcess.CloseRoulette(RouletteId);
-                List<BettingResults> bettingResults = _InternalProcess.ListWinnersRoulette(RouletteId);
-                //_DBProcess.DeleteBets(RouletteId);
-                return Ok(bettingResults);
+            {               
+                return Ok(_InternalProcess.CloseRoulette(rouletteId: rouletteId));
             }
             catch
             {

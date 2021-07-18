@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RouletteTest.DBConnections;
 using RouletteTest.Models;
 
 namespace RouletteTest.Controllers
@@ -12,6 +11,18 @@ namespace RouletteTest.Controllers
         public BetController()
         {
             _InternalProcess = new InternalProcess();
+        }
+        [HttpGet("[action]")]
+        public ObjectResult ListAllBets()
+        {
+            try
+            {
+                return Ok(_InternalProcess.ListBets());
+            }
+            catch
+            {
+                return Ok("Tenemos un inconveniente al extraer la lista de las apuestas. Inténtalo más tarde.");
+            }
         }
         [HttpPost("[action]")]
         public ObjectResult CreateBet(Bet bet)
