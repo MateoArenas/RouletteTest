@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RouletteTest.Model;
+using RouletteTest.DBConnections;
+using RouletteTest.Models;
 
 namespace RouletteTest.Controllers
 {
@@ -7,40 +8,21 @@ namespace RouletteTest.Controllers
     [ApiController]
     public class BetController : ControllerBase
     {
-        private GeneralProcess _generalProcess;
-        private MongoDBConnection _DBProcess;
+        private InternalProcess _InternalProcess;
         public BetController()
         {
-            _generalProcess = new GeneralProcess();
-            _DBProcess = new MongoDBConnection();
+            _InternalProcess = new InternalProcess();
         }
-
         [HttpPost("[action]")]
-        public string CreateBet(Bet bet)
+        public ObjectResult CreateBet(Bet bet)
         {
             try
-            {
-                string ResponseValidates = _generalProcess.ValidateDataBet(bet);
-                if (ResponseValidates != "OK")
-                {
-                    return ResponseValidates;
-                }
-                ResponseValidates = _generalProcess.ValidateMaxAmount(bet.double_BetAmount);
-                if (ResponseValidates != "OK")
-                {
-                    return ResponseValidates;
-                }
-                ResponseValidates = _generalProcess.ValidateChoiceBet(bet.str_ChoiceBet);
-                if (ResponseValidates != "OK")
-                {
-                    return ResponseValidates;
-                }
-                _DBProcess.CreateBet(bet);
-                return "Apuesta ingresada exitosamente.";
+            {             
+                return Ok(_InternalProcess.CreateBet(bet));
             }
             catch
             {
-                return "No podemos ingresar su apuesta, inténtelo más tarde.";
+                return Ok("No podemos ingresar su apuesta, inténtelo más tarde.");
             }
         }
     }

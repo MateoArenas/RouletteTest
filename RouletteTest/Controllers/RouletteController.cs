@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RouletteTest.Model;
-using System;
+using RouletteTest.DBConnections;
+using RouletteTest.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace RouletteTest.Controllers
 {
@@ -11,58 +9,57 @@ namespace RouletteTest.Controllers
     [ApiController]
     public class RouletteController : ControllerBase
     {
-        private GeneralProcess _generalProcess;
+        private InternalProcess _InternalProcess;
         private MongoDBConnection _DBProcess;
         public RouletteController()
         {
-            _generalProcess = new GeneralProcess();
+            _InternalProcess = new InternalProcess();
             _DBProcess = new MongoDBConnection();
         }
         [HttpGet("[action]")]
         public ObjectResult ListRoulettes() 
         {
-            return Ok(_DBProcess.ListRoulettes());
-        }
-        [HttpPost("[action]")]
-        public string CreateRoulette()
-        {
             try
             {
-                Roulette roulette = new Roulette()
-                {
-                    Id = _generalProcess.GenerateRouletteId(),
-                    bool_OpeningStatus = false
-                };
-                _DBProcess.CreateRoulette(roulette);
-                return "El id de su nueva ruleta es: " + roulette.Id;
+                return Ok(_DBProcess.ListRoulettes());
             }
             catch
             {
-                return "No logramas crear su ruleta, inténtalo más tarde.";
-            }
+                return Ok("Tenemos un inconveniente al extraer la lista de las ruletas. Inténtalo más tarde.");
+            }          
         }
-        [HttpPut("[action]")]
-        public string OpenRouletteBets(string Id)
+        [HttpPost("[action]")]
+        public ObjectResult CreateRoulette(string RouletteName)
         {
             try
             {
-                _DBProcess.OpenRoulette(Id);
-                return "Operación aceptada";
+                return Ok(_InternalProcess.CreateRoulette(RouletteName));
+            }
+            catch
+            {
+                return Ok("Tenemos inconvenientes para crear su ruleta, inténtalo más tarde.");
+            }
+        }
+        [HttpPut("[action]")]
+        public ObjectResult OpenRoulette(string RouletteId)
+        {
+            try
+            {               
+                return Ok(_InternalProcess.OpenRoulette(RouletteId));
             }
             catch 
             {
-                return "Operación denegada";
+                return Ok("Operación denegada. Inténtelo más tarde.");
             }
         }
-
         [HttpPut("[action]")]
-        public ObjectResult CloseRouletteBets(string IdRoulette)
+        public ObjectResult CloseRoulette(string RouletteId)
         {
             try
             {
-                _DBProcess.CloseRoulette(IdRoulette);
-                List<BettingResults> bettingResults = _generalProcess.ListWinnersRoulette(IdRoulette);
-                _DBProcess.DeleteBets(IdRoulette);
+                _DBProcess.CloseRoulette(RouletteId);
+                List<BettingResults> bettingResults = _InternalProcess.ListWinnersRoulette(RouletteId);
+                //_DBProcess.DeleteBets(RouletteId);
                 return Ok(bettingResults);
             }
             catch

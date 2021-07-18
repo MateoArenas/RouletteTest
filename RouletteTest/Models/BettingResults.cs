@@ -1,4 +1,4 @@
-﻿namespace RouletteTest.Model
+﻿namespace RouletteTest.Models
 {
     public class BettingResults
     {
